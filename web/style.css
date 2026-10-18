@@ -104,3 +104,9 @@ footer a,.legal a{color:var(--acc)}
   #sidenav{display:none}
   #sidenav.open{display:block;margin-top:8px}
 }
+
+.tn{color:var(--mut);background:var(--bg)}
+.btn.danger{border-color:var(--k);color:var(--k)}
+.keybox{border:2px solid var(--acc);border-radius:6px;padding:14px;margin:0 0 14px;background:var(--surf)}
+code{font-family:ui-monospace,Consolas,monospace;word-break:break-all}
+.keybox code{display:block;padding:8px;background:var(--bg);border:1px solid var(--line);border-radius:4px}
