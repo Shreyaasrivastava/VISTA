@@ -331,3 +331,7 @@ setInterval(() => { if (cur === 'attendee' || cur === 'public') { Sample.tick();
   if (!t) return;
   try { await startSession(t); } catch (err) { endSession(); }
 })();
+if (new URLSearchParams(location.search).get("guest") === "1") {
+  const g = document.getElementById("guest");
+  if (g) g.click();
+}

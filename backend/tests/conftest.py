@@ -4,6 +4,8 @@ os.environ["JWT_SECRET"] = "test-secret-test-secret-123"
 os.environ["DATABASE_URL"] = "sqlite://"
 os.environ["BCRYPT_ROUNDS"] = "4"
 os.environ["CORS_ORIGINS"] = ""
+os.environ["ORGANISER_CODE"] = "org-code-123"
+os.environ["SECURITY_CODE"] = "sec-code-456"
 
 import pytest
 from fastapi.testclient import TestClient
