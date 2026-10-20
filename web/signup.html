@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Sign up | VISTA</title>
+<link rel="stylesheet" href="home.css">
+</head>
+<body>
+<header class="top">
+  <a class="brand" href="home.html" style="text-decoration:none">VISTA</a>
+  <nav><a href="home.html">Home</a><a href="index.html">Log in</a></nav>
+</header>
+<main>
+<section style="max-width:680px">
+  <h1>Create an account</h1>
+  <form id="f" novalidate>
+    <fieldset class="roles">
+      <legend>I am signing up as</legend>
+      <label><input type="radio" name="role" value="attendee" checked><b>Attendee</b><br>Register for events and get a ticket.</label>
+      <label><input type="radio" name="role" value="organiser"><b>Organiser</b><br>Manage your venue, cameras and thresholds.</label>
+      <label><input type="radio" name="role" value="security"><b>Security staff</b><br>See and acknowledge crowd alerts.</label>
+    </fieldset>
+    <div class="field"><label for="u">Username</label><input id="u" autocomplete="username"></div>
+    <div class="field"><label for="p">Password (at least 8 characters)</label><input id="p" type="password" autocomplete="new-password"></div>
+    <div class="field"><label for="p2">Confirm password</label><input id="p2" type="password" autocomplete="new-password"></div>
+    <div class="field" id="vbox" hidden><label for="v">Your venue</label><select id="v"></select></div>
+    <div class="field" id="cbox" hidden><label for="c">Access code (given to you by the VISTA administrator)</label><input id="c" autocomplete="off"></div>
+    <div id="msg" role="alert"></div>
+    <button class="btn" type="submit">Create account</button>
+  </form>
+</section>
+</main>
+<script src="signup.js"></script>
+</body>
+</html>
