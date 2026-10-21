@@ -1,0 +1,215 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>VISTA Crowd Safety | Crowd alerts for public venues</title>
+<meta name="description" content="VISTA estimates how crowded each zone of a station, temple or stadium is from camera images, and sends alerts to venue staff and visitors.">
+<!-- seo:start -->
+<link rel="canonical" href="https://[[FILL: domain]]/">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="VISTA Crowd Safety Module">
+<meta property="og:title" content="VISTA Crowd Safety | Crowd alerts for public venues">
+<meta property="og:description" content="VISTA estimates how crowded each zone of a station, temple or stadium is from camera images, and sends alerts to venue staff and visitors.">
+<meta property="og:url" content="https://[[FILL: domain]]/">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="VISTA Crowd Safety | Crowd alerts for public venues">
+<meta name="twitter:description" content="VISTA estimates how crowded each zone of a station, temple or stadium is from camera images, and sends alerts to venue staff and visitors.">
+<script type="application/ld+json">{"@context":"https://schema.org","@type":"WebSite","name":"VISTA Crowd Safety Module","url":"https://[[FILL: domain]]/"}</script>
+<!-- Google Search Console: after you verify the domain, paste the google-site-verification meta tag here. -->
+<!-- seo:end -->
+<meta name="theme-color" content="#f2f6f8" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#0d1920" media="(prefers-color-scheme: dark)">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<script src="theme.js"></script>
+<link rel="icon" href="favicon.svg" type="image/svg+xml">
+<link rel="icon" href="favicon.ico" sizes="any">
+<link rel="apple-touch-icon" href="apple-touch-icon.png">
+<link href="https://fonts.googleapis.com/css2?family=Noto+Serif+Thai:wght@400;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<a class="skip" href="#main">Skip to content</a>
+<noscript><p style="padding:16px">This site needs JavaScript turned on.</p></noscript>
+<div class="notice" role="note">Prototype. Admin and security screens show live data from the API. Attendee and guest screens still show sample data.</div>
+<header>
+  <div class="brand">VISTA<small>Crowd Safety Module</small></div>
+  <div id="theme" role="group" aria-label="Colour theme"><button type="button" data-mode="light" aria-pressed="false">Light</button><button type="button" data-mode="system" aria-pressed="false">System</button><button type="button" data-mode="dark" aria-pressed="false">Dark</button></div>
+  <div id="who" hidden style="display:flex;gap:12px;align-items:center"><span id="whotxt"></span><button class="btn ghost" id="out">Log out</button></div>
+</header>
+<div id="shell">
+<aside id="side" aria-label="Sidebar" hidden>
+  <div class="side-head"><b id="sidewho"></b><span id="sidesub"></span></div>
+  <button class="btn ghost" id="menubtn" type="button" aria-expanded="false" aria-controls="sidenav">Menu</button>
+  <nav id="sidenav" aria-label="Pages"><ul id="navlist"></ul></nav>
+</aside>
+<main id="main" tabindex="-1">
+<div id="apierr" class="msg t3" role="alert" hidden></div>
+<section id="login">
+  <div class="cols" style="max-width:780px;margin:24px auto 0">
+    <form class="card" id="lg" novalidate>
+      <h1>Log in to VISTA</h1>
+      <p class="sub">VISTA estimates how crowded each zone of a station, temple or stadium is from camera images, and sends alerts to venue staff and visitors. Venue admins, security staff and attendees log in below. Each admin only sees their own venue.</p>
+      <label for="un">Username</label><input type="text" id="un" autocomplete="username">
+      <label for="pw">Password</label><input type="password" id="pw" autocomplete="current-password">
+      <div id="lgmsg" role="alert"></div>
+      <div class="row" style="margin-top:16px"><button class="btn" type="submit" id="lgbtn">Log in</button></div>
+    </form>
+    <div class="card">
+      <h3>No account?</h3>
+      <p class="sub">Check how busy a venue is and get location alerts without signing up.</p>
+      <button class="btn ghost" id="guest" type="button">Continue as guest</button>
+    </div>
+  </div>
+</section>
+
+<section class="page" id="p-admin-overview" hidden>
+  <h2 class="title" tabindex="-1">Overview</h2>
+  <p class="sub">A summary of your venue, updated every 2 seconds from the vision service.</p>
+  <div class="grid" id="ov-cards"></div>
+  <h3 style="margin-top:28px">Zones that need attention</h3>
+  <div class="grid" id="ov-attn" style="margin-top:10px"></div>
+</section>
+
+<section class="page" id="p-admin-zones" hidden>
+  <h2 class="title" tabindex="-1">Live zones</h2>
+  <p class="sub">Occupancy for each zone of your venue, updated every 2 seconds. A zone shows Stale if its camera has sent nothing for 30 seconds.</p>
+  <div class="grid" id="zones"></div>
+</section>
+
+<section class="page" id="p-admin-cameras" hidden>
+  <h2 class="title" tabindex="-1">Cameras</h2>
+  <p class="sub">Add or edit the cameras for your venue. You can change the stream URL, IP address, zone name, range and alert levels.</p>
+  <div class="row"><button class="btn" id="camadd" type="button">Add camera</button></div>
+  <div id="cammsg" role="status"></div>
+  <div id="keybox"></div>
+  <div class="tw"><table>
+    <caption class="sr">Cameras at your venue</caption>
+    <thead><tr><th scope="col">Camera</th><th scope="col">Zone</th><th scope="col">Stream URL</th><th scope="col">IP address</th><th scope="col">Range</th><th scope="col">Caution / Warning / Critical</th><th scope="col">Calibration</th><th scope="col"><span class="sr">Actions</span></th></tr></thead>
+    <tbody id="cams"></tbody>
+  </table></div>
+  <form class="card" id="camform" hidden novalidate style="margin-top:14px">
+    <h3 id="cftitle">Edit camera</h3>
+    <div class="fgrid">
+      <div><label for="cfz">Zone name</label><input type="text" id="cfz" maxlength="80"></div>
+      <div><label for="cfu">Stream URL</label><input type="text" id="cfu" placeholder="rtsp://10.0.4.21/s1"></div>
+      <div><label for="cfi">IP address</label><input type="text" id="cfi" placeholder="10.0.4.21"></div>
+      <div><label for="cfr">Detection range (m)</label><input type="number" id="cfr" min="1" max="200"></div>
+      <div><label for="cfc">Caution at (%)</label><input type="number" id="cfc" min="1" max="100"></div>
+      <div><label for="cfw">Warning at (%)</label><input type="number" id="cfw" min="1" max="100"></div>
+      <div><label for="cfk">Critical at (%)</label><input type="number" id="cfk" min="1" max="100"></div>
+    </div>
+    <div id="cfmsg" role="alert"></div>
+    <div class="row" style="margin-top:16px"><button class="btn" type="submit" id="cfsave">Save camera</button><button class="btn ghost" type="button" id="cfcancel">Cancel</button></div>
+    <div id="cfextra" hidden>
+      <h3 style="margin-top:22px">Calibration and key</h3>
+      <p class="sub" style="margin-bottom:10px">Apply a calibration file made by calibrate.py (camera_patch.json), or generate a new ingest key.</p>
+      <label for="cffile" style="margin-top:0">Calibration file</label>
+      <input type="file" id="cffile" accept=".json,application/json">
+      <div class="row" style="margin-top:14px"><button class="btn ghost" type="button" id="cfkey">Generate a new ingest key</button><button class="btn ghost danger" type="button" id="cfdel">Delete camera</button></div>
+    </div>
+  </form>
+</section>
+
+<section class="page" id="p-admin-thresholds" hidden>
+  <h2 class="title" tabindex="-1">Thresholds</h2>
+  <p class="sub">Occupancy % = people divided by (zone area times the reference density). The server uses 1.08 people per m&sup2; as 100%. Each camera sets its own levels on the Cameras page. These are the defaults.</p>
+  <div class="card"><div class="row" style="margin:0"><span class="pill t0">Normal under 50%</span><span class="pill t1">Caution 50 to 75%</span><span class="pill t2">Warning 75 to 90%</span><span class="pill t3">Critical 90% and above</span></div></div>
+  <h3 style="margin-top:28px">Current levels for your zones</h3>
+  <div class="tw" style="margin-top:10px"><table style="min-width:520px">
+    <caption class="sr">Alert levels for each zone</caption>
+    <thead><tr><th scope="col">Zone</th><th scope="col">Camera</th><th scope="col">Caution / Warning / Critical</th></tr></thead>
+    <tbody id="th-body"></tbody>
+  </table></div>
+</section>
+
+<section class="page" id="p-admin-guide" hidden>
+  <h2 class="title" tabindex="-1">Camera setup guide</h2>
+  <p class="sub">How to bring a new camera online. A camera can send readings only after step 5.</p>
+  <div class="card"><ol class="steps">
+    <li>Add the camera on the Cameras page and copy its ingest key. It is shown only once.</li>
+    <li>On a frame from the camera, pick 4 or more floor points and measure their real positions in metres in your venue's coordinate system.</li>
+    <li>Put the points in a points.json file and run <code>python calibrate.py points.json</code> from the vision folder. It prints the calibration error. Aim for under 0.25 m.</li>
+    <li>Open the camera with Edit, then choose the camera_patch.json file under Calibration file.</li>
+    <li>Start the vision service with the ingest key as VISTA_CAMERA_KEY. The zone shows live numbers within a few seconds.</li>
+  </ol></div>
+  <div class="row" style="margin-top:14px"><button class="btn" type="button" data-go="cameras">Go to Cameras</button></div>
+</section>
+
+<section class="page" id="p-security-alerts" hidden>
+  <h2 class="title" tabindex="-1">Alerts</h2>
+  <p class="sub">Alerts for your venue will appear here with an Acknowledge button. Unacknowledged Critical alerts will escalate to the control room.</p>
+  <div class="empty" style="max-width:640px">The alert engine is not built yet (Phase 2). Until then, check Zone status for the current level of each zone.<br><button class="btn ghost" type="button" data-go="status" style="margin-top:10px">Go to Zone status</button></div>
+</section>
+
+<section class="page" id="p-security-status" hidden>
+  <h2 class="title" tabindex="-1">Zone status</h2>
+  <p class="sub">Current level of every zone at your venue, updated every 2 seconds.</p>
+  <div class="grid" id="zones-sec"></div>
+</section>
+
+<section class="page" id="p-attendee-register" hidden>
+  <h2 class="title" tabindex="-1">Register</h2>
+  <p class="sub">Register for a venue and get a QR code for check-in. Registration pauses on its own while a zone is at Critical.</p>
+  <div class="msg t1" style="max-width:640px">Sample data. Real registration and signed QR codes arrive in Phase 4.</div>
+  <form class="card" id="reg" novalidate style="max-width:520px">
+    <label for="nm">Full name</label><input type="text" id="nm" autocomplete="name">
+    <label for="ph">Phone number</label><input type="tel" id="ph" inputmode="numeric" placeholder="10 digits" autocomplete="tel">
+    <label for="vn">Venue</label><select id="vn"></select>
+    <label id="ml">Registration type</label>
+    <div class="radio" role="radiogroup" aria-labelledby="ml">
+      <label><input type="radio" name="mode" value="Pre-registration" checked> Pre-registration</label>
+      <label><input type="radio" name="mode" value="On-the-spot"> On-the-spot</label>
+    </div>
+    <div id="regmsg" role="alert"></div>
+    <div class="row" style="margin-top:16px"><button class="btn" type="submit">Register and get my QR code</button></div>
+  </form>
+</section>
+
+<section class="page" id="p-attendee-ticket" hidden>
+  <h2 class="title" tabindex="-1">My ticket</h2>
+  <p class="sub">Show this code at the entry point.</p>
+  <div class="msg t1" style="max-width:640px">Sample data. This is a sample ticket and cannot be scanned.</div>
+  <div class="card ticket" id="ticket" style="max-width:420px"></div>
+</section>
+
+<section class="page" id="p-attendee-venues" hidden>
+  <h2 class="title" tabindex="-1">Venue crowding</h2>
+  <p class="sub">See how busy a venue is before you go.</p>
+  <div class="msg t1" style="max-width:640px">Sample data. These numbers are samples until the public venue API exists.</div>
+  <label for="qa" style="margin-top:0">Search venues</label>
+  <input type="text" id="qa" placeholder="Station, temple, stadium" style="max-width:420px">
+  <div id="vlist-a" style="margin-top:12px;display:grid;gap:10px;max-width:640px"></div>
+</section>
+
+<section class="page" id="p-public-venues" hidden>
+  <h2 class="title" tabindex="-1">Venue crowding</h2>
+  <p class="sub">See how busy a venue is before you go. Read-only, no registration needed.</p>
+  <div class="msg t1" style="max-width:640px">Sample data. These numbers are samples until the public venue API exists.</div>
+  <label for="q" style="margin-top:0">Search venues</label>
+  <input type="text" id="q" placeholder="Station, temple, stadium" style="max-width:420px">
+  <div id="vlist" style="margin-top:12px;display:grid;gap:10px;max-width:640px"></div>
+</section>
+
+<section class="page" id="p-public-location" hidden>
+  <h2 class="title" tabindex="-1">Location alerts</h2>
+  <p class="sub">Turn on location to get alerts for the zone you are standing in. No sign-up needed.</p>
+  <div class="msg t1" style="max-width:640px">Sample data. Location alerts are a demo until the geofence arrives in Phase 3.</div>
+  <div class="row"><button class="btn ghost" id="loc" type="button">Turn location on (demo: Platform 1)</button></div>
+  <div id="geo" style="max-width:640px"></div>
+</section>
+
+</main>
+</div>
+<footer>
+  <span>VISTA Crowd Safety Module</span>
+  <a href="privacy.html">Privacy policy</a>
+  <a href="terms.html">Terms and conditions</a>
+</footer>
+<script src="config.js"></script>
+<script src="api.js"></script>
+<script src="sample.js"></script>
+<script src="app.js"></script>
+</body>
+</html>
