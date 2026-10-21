@@ -7,3 +7,15 @@ __pycache__/
 __pycache__/
 *.pyc
 *.db
+
+.env
+backend/.env
+.venv/
+__pycache__/
+*.db
+
+.env
+backend/.env
+.venv/
+__pycache__/
+*.db

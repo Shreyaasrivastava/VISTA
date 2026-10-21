@@ -12,7 +12,8 @@ class Settings(BaseSettings):
     jwt_minutes: int = 60
     bcrypt_rounds: int = 12
     cors_origins: str = ""
-
+    organiser_code: str = ""
+    security_code: str = ""
     # People per square metre that counts as 100% occupancy of a zone.
     # TODO(team): confirm this value against the Fruin source before the viva.
     ref_density: float = 1.08
