@@ -31,6 +31,6 @@ $("f").addEventListener("submit", async ev => {
     const data = await res.json().catch(() => ({}));
     if (!res.ok) return show(typeof data.detail === "string" ? data.detail : "Please check the form and try again.");
     show("Account created. Taking you to log in...", true);
-    setTimeout(() => { location.href = "index.html"; }, 1500);
+    setTimeout(() => { location.href = "app.html"; }, 1500);
   } catch (err) { show("Cannot reach the server. Check that the backend is running."); }
 });

@@ -2,7 +2,8 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
 from .config import get_settings
-from .routers import auth, cameras, density, public, signup, venues
+from .routers import auth, cameras, density, venues
+
 app = FastAPI(title="VISTA API", version="0.1.0", description="Phase 1: login, venue-scoped access, cameras, density ingest.")
 
 origins = get_settings().cors_list
@@ -12,7 +13,7 @@ if origins:
         allow_headers=["Authorization", "Content-Type", "X-Camera-Key"],
     )
 
-for r in (auth.router, signup.router,public.router,venues.router, cameras.router, density.router):
+for r in (auth.router, venues.router, cameras.router, density.router):
     app.include_router(r)
     app.include_router(public.router)
     app.include_router(signup.router)

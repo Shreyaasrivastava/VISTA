@@ -50,7 +50,7 @@
 <header>
   <div class="logo">V</div>
   <div class="brand">VISTA<small>Crowd Safety Module</small></div>
-  <nav><a href="index.html" class="keep">Home</a><a href="login.html" class="keep">Log in</a></nav>
+  <nav><a href="app.html" class="keep">Home</a><a href="app.html" class="keep">Log in</a></nav>
 </header>
 
 <main>
@@ -82,12 +82,12 @@
     <button type="submit" id="go">Create account</button>
   </form>
 
-  <p class="alt">Already have an account? <a href="login.html">Log in</a></p>
+  <p class="alt">Already have an account? <a href="app.html">Log in</a></p>
 </main>
 
 <script>
   // CHANGE THIS to your real FastAPI signup endpoint
-  const API_URL = "http://127.0.0.1:8000/api/signup";
+  const API_URL = "http://127.0.0.1:8000/auth/signup";
 
   const f = document.getElementById("f"), msg = document.getElementById("msg"), go = document.getElementById("go");
   const say = (t, c) => { msg.textContent = t; msg.className = c || ""; };
@@ -110,7 +110,7 @@
       const data = await res.json().catch(() => ({}));
       if (!res.ok) throw new Error(data.detail || "Signup failed (" + res.status + ").");
       say("Account created. Redirecting to log in...", "ok");
-      setTimeout(() => location.href = "login.html", 900);
+      setTimeout(() => location.href = "app.html", 900);
     } catch (err) {
       // fetch throws TypeError when the backend is not reachable
       say(err instanceof TypeError
