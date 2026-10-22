@@ -1,0 +1,60 @@
+<!doctype html>
+<html lang="en">
+<head>
+<title>Forgot password | VISTA Crowd Safety</title>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="robots" content="noindex">
+<link rel="icon" href="favicon.svg" type="image/svg+xml">
+<link rel="icon" href="favicon.ico" sizes="any">
+<link rel="apple-touch-icon" href="apple-touch-icon.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Serif+Thai:wght@400;700&display=swap" rel="stylesheet">
+<script src="theme.js"></script>
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<a class="skip" href="#main">Skip to content</a>
+<header>
+  <div class="brand"><a href="index.html">VISTA</a><small>Crowd Safety Module</small></div>
+  <div id="theme" role="group" aria-label="Colour theme"><button type="button" data-mode="light" aria-pressed="false">Light</button><button type="button" data-mode="system" aria-pressed="false">System</button><button type="button" data-mode="dark" aria-pressed="false">Dark</button></div>
+</header>
+<main id="main" class="legal" tabindex="-1" style="max-width:560px">
+  <h1>Forgot password</h1>
+  <p class="sub">Answer the recovery question you chose when you registered, then pick a new password.</p>
+
+  <form class="card" id="f1" novalidate>
+    <label for="user" style="margin-top:0">Username</label>
+    <input type="text" id="user" autocomplete="username">
+    <div id="m1" role="alert"></div>
+    <div class="row" style="margin-top:16px"><button class="btn" type="submit" id="b1">Show my question</button></div>
+  </form>
+
+  <form class="card" id="f2" hidden novalidate>
+    <p style="margin:0 0 4px;color:var(--mut)">Your question</p>
+    <p id="question" style="margin:0 0 6px;font-weight:700"></p>
+    <label for="answer">Your answer</label>
+    <input type="password" id="answer" autocomplete="off">
+    <label for="np">New password (at least 10 characters)</label>
+    <input type="password" id="np" autocomplete="new-password">
+    <label for="np2">Type the new password again</label>
+    <input type="password" id="np2" autocomplete="new-password">
+    <div class="radio" style="margin-top:12px"><label><input type="checkbox" id="show"> Show what I type</label></div>
+    <div id="m2" role="alert"></div>
+    <div class="row" style="margin-top:16px"><button class="btn" type="submit" id="b2">Change password</button><button class="btn ghost" type="button" id="again">Start again</button></div>
+    <p class="sub" style="margin:14px 0 0;font-size:14px">The question does not look familiar? Then no recovery question was saved for this account. Ask the platform admin to reset your password.</p>
+  </form>
+
+  <div class="card" id="done" hidden role="status">
+    <h2 style="margin:0 0 8px;font-size:1.25rem">Password changed</h2>
+    <p style="margin:0 0 14px">You can log in with your new password now.</p>
+    <a class="btn" href="app.html" style="text-decoration:none;display:inline-block">Go to log in</a>
+  </div>
+
+  <p style="margin-top:18px"><a href="app.html">Back to log in</a></p>
+</main>
+<script src="config.js"></script>
+<script src="forgot.js"></script>
+</body>
+</html>
