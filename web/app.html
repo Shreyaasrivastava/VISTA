@@ -3,21 +3,9 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<title>VISTA Crowd Safety | Crowd alerts for public venues</title>
+<title>Log in | VISTA Crowd Safety</title>
 <meta name="description" content="VISTA estimates how crowded each zone of a station, temple or stadium is from camera images, and sends alerts to venue staff and visitors.">
-<!-- seo:start -->
-<link rel="canonical" href="https://[[FILL: domain]]/">
-<meta property="og:type" content="website">
-<meta property="og:site_name" content="VISTA Crowd Safety Module">
-<meta property="og:title" content="VISTA Crowd Safety | Crowd alerts for public venues">
-<meta property="og:description" content="VISTA estimates how crowded each zone of a station, temple or stadium is from camera images, and sends alerts to venue staff and visitors.">
-<meta property="og:url" content="https://[[FILL: domain]]/">
-<meta name="twitter:card" content="summary">
-<meta name="twitter:title" content="VISTA Crowd Safety | Crowd alerts for public venues">
-<meta name="twitter:description" content="VISTA estimates how crowded each zone of a station, temple or stadium is from camera images, and sends alerts to venue staff and visitors.">
-<script type="application/ld+json">{"@context":"https://schema.org","@type":"WebSite","name":"VISTA Crowd Safety Module","url":"https://[[FILL: domain]]/"}</script>
-<!-- Google Search Console: after you verify the domain, paste the google-site-verification meta tag here. -->
-<!-- seo:end -->
+<meta name="robots" content="noindex">
 <meta name="theme-color" content="#f2f6f8" media="(prefers-color-scheme: light)">
 <meta name="theme-color" content="#0d1920" media="(prefers-color-scheme: dark)">
 <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -36,7 +24,7 @@
 <header>
   <div class="brand">VISTA<small>Crowd Safety Module</small></div>
   <div id="theme" role="group" aria-label="Colour theme"><button type="button" data-mode="light" aria-pressed="false">Light</button><button type="button" data-mode="system" aria-pressed="false">System</button><button type="button" data-mode="dark" aria-pressed="false">Dark</button></div>
-  <div id="who" hidden style="display:flex;gap:12px;align-items:center"><span id="whotxt"></span><button class="btn ghost" id="out">Log out</button></div>
+  <div id="who" hidden style="display:flex;gap:12px;align-items:center"><a href="recovery.html">Recovery question</a><span id="whotxt"></span><button class="btn ghost" id="out">Log out</button></div>
 </header>
 <div id="shell">
 <aside id="side" aria-label="Sidebar" hidden>
@@ -55,6 +43,7 @@
       <label for="pw">Password</label><input type="password" id="pw" autocomplete="current-password">
       <div id="lgmsg" role="alert"></div>
       <div class="row" style="margin-top:16px"><button class="btn" type="submit" id="lgbtn">Log in</button></div>
+      <p style="margin:14px 0 0"><a href="forgot.html">Forgot password?</a></p>
     </form>
     <div class="card">
       <h3>No account?</h3>

@@ -77,3 +77,13 @@ class DensityReading(Base):
     tier: Mapped[int] = mapped_column(Integer)
     confidence: Mapped[float | None] = mapped_column(Float, nullable=True)
     degraded: Mapped[bool] = mapped_column(Boolean, default=False)
+class Recovery(Base):
+    """Password recovery question for one user. The answer is stored only as a hash."""
+    __tablename__ = "recoveries"
+
+    user_id: Mapped[int] = mapped_column(ForeignKey("users.id"), primary_key=True)
+    question: Mapped[str] = mapped_column(String(160))
+    answer_hash: Mapped[str] = mapped_column(String(100))
+    failed_attempts: Mapped[int] = mapped_column(Integer, default=0)
+    locked_until: Mapped[datetime | None] = mapped_column(DateTime, nullable=True)
+    updated_at: Mapped[datetime] = mapped_column(DateTime, default=utcnow)
