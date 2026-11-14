@@ -59,8 +59,7 @@ def main() -> int:
             ingestor.send(res.second, res.count, res.confidence, res.degraded)
 
     try:
-        for r in model.track(source=args.source, stream=True, persist=True, tracker="bytetrack.yaml",
-                             classes=[0], conf=args.conf, imgsz=args.imgsz, verbose=False):
+        for r in model.predict(source=args.source, stream=True, classes=[0], conf=args.conf, imgsz=args.imgsz, verbose=False):
             boxes = r.boxes
             if boxes is None or len(boxes) == 0:
                 foot, conf = np.empty((0, 2)), None

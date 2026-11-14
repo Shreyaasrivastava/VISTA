@@ -59,4 +59,4 @@
     try { await showStatus(); $('rf').hidden = false; }
     catch (err) { if (err.status === 401) gate(err.message); else { $('rf').hidden = false; say($('status'), 't3', err.message); } }
   })();
-})();
+})()    ;

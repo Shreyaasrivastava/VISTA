@@ -51,6 +51,7 @@ const Api = (() => {
     venues: () => req('GET', '/venues'),
     cameras: venueId => req('GET', `/venues/${venueId}/cameras`),
     latest: venueId => req('GET', `/venues/${venueId}/density/latest`),
+    alerts: venueId => req('GET', `/venues/${venueId}/alerts?limit=100`),
     createCamera: (venueId, body) => req('POST', `/venues/${venueId}/cameras`, body),
     patchCamera: (id, body) => req('PATCH', `/cameras/${id}`, body),
     deleteCamera: id => req('DELETE', `/cameras/${id}`),

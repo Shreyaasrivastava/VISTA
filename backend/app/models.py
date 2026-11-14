@@ -87,3 +87,17 @@ class Recovery(Base):
     failed_attempts: Mapped[int] = mapped_column(Integer, default=0)
     locked_until: Mapped[datetime | None] = mapped_column(DateTime, nullable=True)
     updated_at: Mapped[datetime] = mapped_column(DateTime, default=utcnow)
+
+class Alert(Base):
+    """One Warning/Critical episode for a camera zone. resolved_at is null while it is open."""
+    __tablename__ = "alerts"
+    __table_args__ = (Index("ix_alerts_venue_started", "venue_id", "started_at"),)
+
+    id: Mapped[int] = mapped_column(Integer, primary_key=True)
+    venue_id: Mapped[int] = mapped_column(ForeignKey("venues.id"), index=True)
+    camera_id: Mapped[int] = mapped_column(ForeignKey("cameras.id"), index=True)
+    tier: Mapped[int] = mapped_column(Integer)  # 2 Warning, 3 Critical
+    peak_pct: Mapped[float] = mapped_column(Float)
+    escalated: Mapped[bool] = mapped_column(Boolean, default=False)
+    started_at: Mapped[datetime] = mapped_column(DateTime, default=utcnow)
+    resolved_at: Mapped[datetime | None] = mapped_column(DateTime, nullable=True)

@@ -8,6 +8,7 @@ from ..models import Camera, DensityReading, utcnow
 from ..schemas import DensityIn, DensityOut
 from ..security import hash_key
 from ..services import camera_thresholds, occupancy_pct, reading_out, tier_for
+from ..alerts.service import process_reading
 
 router = APIRouter(tags=["density"])
 
@@ -30,4 +31,5 @@ def post_density(body: DensityIn, x_camera_key: str | None = Header(default=None
     )
     db.add(reading)
     db.commit()
+    process_reading(db, cam, reading)
     return reading_out(reading)
