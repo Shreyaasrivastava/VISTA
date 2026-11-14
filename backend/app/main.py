@@ -4,7 +4,8 @@ from fastapi.middleware.cors import CORSMiddleware
 from .config import get_settings
 from .routers import auth, cameras, density, public, recovery, signup, venues
 app = FastAPI(title="VISTA API", version="0.1.0", description="Phase 1: login, venue-scoped access, cameras, density ingest.")
-
+from app.alerts.router import router as alerts_router
+app.include_router(alerts_router)
 origins = get_settings().cors_list
 if origins:
     app.add_middleware(

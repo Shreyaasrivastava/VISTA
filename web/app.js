@@ -6,7 +6,7 @@ const pill = t => `<span class="pill t${t}">${T[t]}</span>`;
 const neutral = label => `<span class="pill tn">${esc(label)}</span>`;
 
 const NAV = {
-  admin: [['overview', 'Overview'], ['zones', 'Live zones'], ['cameras', 'Cameras'], ['thresholds', 'Thresholds'], ['guide', 'Camera setup guide']],
+  admin: [['overview', 'Overview'], ['zones', 'Live zones'], ['alerts', 'Alerts'], ['cameras', 'Cameras'], ['thresholds', 'Thresholds'], ['guide', 'Camera setup guide']],
   security: [['alerts', 'Alerts'], ['status', 'Zone status']],
   attendee: [['register', 'Register'], ['ticket', 'My ticket'], ['venues', 'Venue crowding']],
   public: [['venues', 'Venue crowding'], ['location', 'Location alerts']],
@@ -15,9 +15,9 @@ const EMPTY_TICKET = '<div class="empty">You have not registered yet.<br><button
 const DEFAULT_TITLE = document.title;
 const FRESH_MS = 30000;          // a reading older than this is "stale"
 const POLL_MS = 2000;
-const LIVE_PAGES = { admin: ['overview', 'zones'], security: ['status'] };
+const LIVE_PAGES = { admin: ['overview', 'zones', 'alerts'], security: ['alerts', 'status'] };
 
-const S = { user: null, venue: null, cameras: [], latest: [] };
+const S = { user: null, venue: null, cameras: [], latest: [], alerts: [] };
 let cur = '', page = '', geo = false, editing = null, pollTimer = null, polling = false;
 
 // ---------- small helpers ----------
@@ -59,17 +59,40 @@ function renderOverview() {
   const fresh = S.latest.filter(x => x.reading && ageMs(x.reading) <= FRESH_MS);
   const need = fresh.filter(x => x.reading.tier >= 2);
   const uncal = cams.filter(c => !c.calibrated).length;
+  const openAlerts = S.alerts.filter(a => !a.resolved_at);
   const card = (l, v, t) => `<div class="card"><div style="color:var(--mut)">${l}</div><div class="big">${v}</div><p style="margin:4px 0 0;color:var(--mut);font-size:14px">${t}</p></div>`;
   $('ov-cards').innerHTML =
     card('Zones monitored', cams.length, need.length ? `${need.length} at Warning or Critical` : 'None at Warning or Critical') +
     card('Cameras calibrated', `${cams.length - uncal} of ${cams.length}`, uncal ? `${uncal} not calibrated yet` : 'All calibrated') +
-    card('Reporting now', `${fresh.length} of ${cams.length}`, 'Readings in the last 30 seconds');
+    card('Reporting now', `${fresh.length} of ${cams.length}`, 'Readings in the last 30 seconds') +
+    card('Active alerts', openAlerts.length, openAlerts.length ? `${openAlerts.filter(a => a.tier === 3).length} Critical, ${openAlerts.filter(a => a.tier === 2).length} Warning` : 'No open alerts');
   $('ov-attn').innerHTML = need.length ? need.map(zoneCardApi).join('') : '<div class="empty">No zone is at Warning or Critical right now.</div>';
 }
 function renderThresholds() {
   $('th-body').innerHTML = S.cameras.length
     ? S.cameras.map(c => `<tr><td>${esc(c.zone_name)}</td><td>${esc(c.code)}</td><td>${c.thresholds.caution} / ${c.thresholds.warning} / ${c.thresholds.critical}</td></tr>`).join('')
     : '<tr><td colspan="3">No cameras yet.</td></tr>';
+}
+// ---------- alerts ----------
+const fmtTime = iso => new Date(iso).toLocaleString([], { day: '2-digit', month: 'short', hour: '2-digit', minute: '2-digit', second: '2-digit' });
+function lastedText(a) {
+  const end = a.resolved_at ? Date.parse(a.resolved_at) : Date.now();
+  const s = Math.max(0, Math.round((end - Date.parse(a.started_at)) / 1000));
+  if (s < 60) return `${s} s`;
+  const m = Math.floor(s / 60);
+  return m < 60 ? `${m} min ${s % 60} s` : `${Math.floor(m / 60)} h ${m % 60} min`;
+}
+function renderAlerts(sfx) {
+  const open = S.alerts.filter(a => !a.resolved_at);
+  $('al-now-' + sfx).innerHTML = open.length
+    ? open.map(a => `<div class="card zone t${a.tier}" style="background:var(--surf)">
+   <div class="top"><div><b>${esc(a.zone_name)}</b><span class="v">${esc(a.camera_code)}</span></div>${pill(a.tier)}</div>
+   <p style="margin:10px 0 0;color:var(--mut);font-size:14px">Peak ${Math.round(a.peak_pct)}% &middot; open for ${lastedText(a)}${a.escalated ? ' &middot; Escalated' : ''}</p>
+   <p style="margin:4px 0 0;color:var(--mut);font-size:14px">Started ${esc(fmtTime(a.started_at))}</p></div>`).join('')
+    : '<div class="empty">No open alerts. Every zone is at Normal or Caution.</div>';
+  $('al-log-' + sfx).innerHTML = S.alerts.length
+    ? S.alerts.map(a => `<tr><td>${esc(a.zone_name)} (${esc(a.camera_code)})</td><td>${pill(a.tier)}</td><td>${Math.round(a.peak_pct)}%</td><td>${esc(fmtTime(a.started_at))}</td><td>${lastedText(a)}</td><td>${a.resolved_at ? 'Resolved' : 'Open'}${a.escalated ? ', escalated' : ''}</td></tr>`).join('')
+    : '<tr><td colspan="6">No alerts yet.</td></tr>';
 }
 function renderCams() {
   $('cams').innerHTML = S.cameras.length
@@ -87,8 +110,8 @@ function venueList(target, qid) {
 
 // ---------- render ----------
 function render() {
-  if (cur === 'admin') { renderOverview(); $('zones').innerHTML = zoneCards(); renderThresholds(); }
-  else if (cur === 'security') { $('zones-sec').innerHTML = zoneCards(); }
+  if (cur === 'admin') { renderOverview(); $('zones').innerHTML = zoneCards(); renderThresholds(); renderAlerts('admin'); }
+  else if (cur === 'security') { $('zones-sec').innerHTML = zoneCards(); renderAlerts('sec'); }
   else if (cur === 'attendee') venueList('vlist-a', 'qa');
   else if (cur === 'public') {
     venueList('vlist', 'q');
@@ -103,10 +126,11 @@ async function refresh(which) {
   if (!S.venue) return;
   try {
     if (which === 'both') {
-      const [cams, latest] = await Promise.all([Api.cameras(S.venue.id), Api.latest(S.venue.id)]);
-      S.cameras = cams; S.latest = latest;
+      const [cams, latest, alerts] = await Promise.all([Api.cameras(S.venue.id), Api.latest(S.venue.id), Api.alerts(S.venue.id)]);
+      S.cameras = cams; S.latest = latest; S.alerts = alerts;
     } else {
-      S.latest = await Api.latest(S.venue.id);
+      const [latest, alerts] = await Promise.all([Api.latest(S.venue.id), Api.alerts(S.venue.id)]);
+      S.latest = latest; S.alerts = alerts;
     }
     showErr('');
   } catch (err) {
@@ -175,7 +199,7 @@ function loadToken() { try { return sessionStorage.getItem(TOKEN_KEY); } catch (
 
 function endSession() {
   Api.setToken(null); saveToken(null);
-  S.user = null; S.venue = null; S.cameras = []; S.latest = []; editing = null; geo = false;
+  S.user = null; S.venue = null; S.cameras = []; S.latest = []; S.alerts = []; editing = null; geo = false;
   $('reg').reset(); $('regmsg').innerHTML = ''; $('ticket').innerHTML = EMPTY_TICKET;
   $('keybox').innerHTML = ''; $('cammsg').innerHTML = ''; showErr('');
   go('');

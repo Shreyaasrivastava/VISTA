@@ -113,6 +113,19 @@
   </table></div>
 </section>
 
+<section class="page" id="p-admin-alerts" hidden>
+  <h2 class="title" tabindex="-1">Alerts</h2>
+  <p class="sub">Warning and Critical alerts for your venue, updated every 2 seconds. An alert opens when a zone stays at Warning or Critical for a few seconds, and closes when it stays lower for longer.</p>
+  <h3>Active now</h3>
+  <div class="grid" id="al-now-admin" style="margin-top:10px"></div>
+  <h3 style="margin-top:28px">Alert log</h3>
+  <div class="tw" style="margin-top:10px"><table style="min-width:640px">
+    <caption class="sr">Alert log for your venue</caption>
+    <thead><tr><th scope="col">Zone</th><th scope="col">Level</th><th scope="col">Peak</th><th scope="col">Started</th><th scope="col">Lasted</th><th scope="col">Status</th></tr></thead>
+    <tbody id="al-log-admin"></tbody>
+  </table></div>
+</section>
+
 <section class="page" id="p-admin-guide" hidden>
   <h2 class="title" tabindex="-1">Camera setup guide</h2>
   <p class="sub">How to bring a new camera online. A camera can send readings only after step 5.</p>
@@ -128,8 +141,15 @@
 
 <section class="page" id="p-security-alerts" hidden>
   <h2 class="title" tabindex="-1">Alerts</h2>
-  <p class="sub">Alerts for your venue will appear here with an Acknowledge button. Unacknowledged Critical alerts will escalate to the control room.</p>
-  <div class="empty" style="max-width:640px">The alert engine is not built yet (Phase 2). Until then, check Zone status for the current level of each zone.<br><button class="btn ghost" type="button" data-go="status" style="margin-top:10px">Go to Zone status</button></div>
+  <p class="sub">Warning and Critical alerts for your venue, updated every 2 seconds. An alert opens when a zone stays at Warning or Critical for a few seconds, and closes when it stays lower for longer.</p>
+  <h3>Active now</h3>
+  <div class="grid" id="al-now-sec" style="margin-top:10px"></div>
+  <h3 style="margin-top:28px">Alert log</h3>
+  <div class="tw" style="margin-top:10px"><table style="min-width:640px">
+    <caption class="sr">Alert log for your venue</caption>
+    <thead><tr><th scope="col">Zone</th><th scope="col">Level</th><th scope="col">Peak</th><th scope="col">Started</th><th scope="col">Lasted</th><th scope="col">Status</th></tr></thead>
+    <tbody id="al-log-sec"></tbody>
+  </table></div>
 </section>
 
 <section class="page" id="p-security-status" hidden>

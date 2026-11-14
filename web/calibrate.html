@@ -1,0 +1,103 @@
+<!doctype html>
+<meta charset="utf-8">
+<title>Camera Calibration</title>
+<body style="font-family:sans-serif;padding:16px">
+<h3>Calibration: 4 floor points click karo</h3>
+<input type="file" id="f" accept="image/*,video/*">
+<p id="msg">Clip ya image choose karo.</p>
+<canvas id="c" style="border:1px solid #888;max-width:100%;cursor:crosshair"></canvas>
+<pre id="out"></pre>
+<button id="reset">Reset</button>
+<button id="save" disabled>Download JSON</button>
+<video id="v" muted style="display:none"></video>
+<script>
+const c = document.getElementById('c'), ctx = c.getContext('2d');
+const v = document.getElementById('v'), msg = document.getElementById('msg');
+const out = document.getElementById('out'), saveBtn = document.getElementById('save');
+let img = null, imgPts = [], worldPts = [], H = null;
+
+function redraw() {
+  if (!img) return;
+  ctx.drawImage(img, 0, 0);
+  ctx.font = '20px sans-serif';
+  imgPts.forEach((p, i) => {
+    ctx.fillStyle = 'red';
+    ctx.beginPath(); ctx.arc(p[0], p[1], 6, 0, 7); ctx.fill();
+    ctx.fillStyle = 'yellow';
+    ctx.fillText((i + 1) + ' (' + worldPts[i] + ')', p[0] + 10, p[1] - 10);
+  });
+}
+
+document.getElementById('f').onchange = e => {
+  const file = e.target.files[0]; if (!file) return;
+  const url = URL.createObjectURL(file);
+  if (file.type.startsWith('video')) {
+    v.src = url;
+    v.onloadeddata = () => { v.currentTime = 1; };
+    v.onseeked = () => { c.width = v.videoWidth; c.height = v.videoHeight; img = v; reset(); };
+  } else {
+    const i = new Image();
+    i.onload = () => { c.width = i.width; c.height = i.height; img = i; reset(); };
+    i.src = url;
+  }
+};
+
+c.onclick = e => {
+  if (!img || imgPts.length >= 4) return;
+  const r = c.getBoundingClientRect();
+  const x = (e.clientX - r.left) * c.width / r.width;
+  const y = (e.clientY - r.top) * c.height / r.height;
+  const w = prompt('Point ' + (imgPts.length + 1) + ' ke real coordinates metres mein (X,Y), jaise 0,0');
+  if (!w) return;
+  const [X, Y] = w.split(',').map(Number);
+  if (isNaN(X) || isNaN(Y)) { alert('Format galat. Aise likho: 2,3'); return; }
+  imgPts.push([x, y]); worldPts.push([X, Y]);
+  redraw();
+  msg.textContent = imgPts.length + '/4 points done';
+  if (imgPts.length === 4) {
+    H = homography(imgPts, worldPts);
+    if (!H) { msg.textContent = 'Points collinear hain, reset karke alag points lo.'; return; }
+    out.textContent = JSON.stringify(H, null, 2);
+    saveBtn.disabled = false;
+    msg.textContent = '4/4 done. Download karo.';
+  }
+};
+
+function reset() {
+  imgPts = []; worldPts = []; H = null; out.textContent = '';
+  saveBtn.disabled = true; msg.textContent = '0/4 points. Floor ke 4 corners click karo.';
+  redraw();
+}
+document.getElementById('reset').onclick = reset;
+
+// 4 point pairs -> 3x3 homography (image px -> world metres)
+function homography(src, dst) {
+  const A = [];
+  for (let i = 0; i < 4; i++) {
+    const [x, y] = src[i], [X, Y] = dst[i];
+    A.push([x, y, 1, 0, 0, 0, -X * x, -X * y, X]);
+    A.push([0, 0, 0, x, y, 1, -Y * x, -Y * y, Y]);
+  }
+  for (let i = 0; i < 8; i++) {
+    let m = i;
+    for (let r = i + 1; r < 8; r++) if (Math.abs(A[r][i]) > Math.abs(A[m][i])) m = r;
+    if (Math.abs(A[m][i]) < 1e-9) return null;
+    [A[i], A[m]] = [A[m], A[i]];
+    for (let r = 0; r < 8; r++) {
+      if (r === i) continue;
+      const f = A[r][i] / A[i][i];
+      for (let k = i; k < 9; k++) A[r][k] -= f * A[i][k];
+    }
+  }
+  const h = A.map((row, i) => row[8] / row[i]);
+  return [[h[0], h[1], h[2]], [h[3], h[4], h[5]], [h[6], h[7], 1]];
+}
+
+saveBtn.onclick = () => {
+  const data = { image_points: imgPts, world_points: worldPts, homography: H };
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' }));
+  a.download = 'calibration.json'; a.click();
+};
+</script>
+</body>
